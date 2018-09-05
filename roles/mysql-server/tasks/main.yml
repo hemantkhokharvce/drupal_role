@@ -1,0 +1,12 @@
+---
+# tasks file for mysql-server
+- name: Fetch OS 
+  include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Fetch OS
+  include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: db configuration
+  include: dbconfiguration.yml

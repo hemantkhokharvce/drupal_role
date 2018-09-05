@@ -1,0 +1,33 @@
+---
+- name: download 
+  command: wget https://ftp.drupal.org/files/projects/drupal-8.4.2.tar.gz
+  args: 
+    chdir: /var/www
+
+- name: make directory 
+  file:
+    path: /var/www/html/drupal
+    state: directory
+    mode: 0755
+
+- name: unzip download file
+  unarchive: src=/var/www/drupal-8.4.2.tar.gz  dest=/var/www/html/drupal remote_src=yes
+
+- name: set the permmision 
+  command: chown -R www-data:www-data /var/www/html/drupal
+
+- name: change the permission
+  command: chmod -R 755 /var/www/html/drupal
+
+- name: configure Nginx Drupal Site
+  copy: 
+    src: drupal 
+    dest: /etc/nginx/sites-available/drupal
+
+- name: enable the drupal site
+  command: ln -s /etc/nginx/sites-available/drupal /etc/nginx/sites-enabled/
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted

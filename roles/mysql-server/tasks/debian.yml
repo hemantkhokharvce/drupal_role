@@ -1,0 +1,26 @@
+---
+
+- name: Installing Mysql and dependencies
+  apt: name={{item}} state=present  update_cache=yes
+  with_items:
+      - mysql-server
+      - python-mysqldb
+  notify: mysql restart
+
+- name: Starting Mysql service
+  command: service mysql start warn=no
+  ignore_errors: yes
+
+- name: Mysql Secure Installation
+  include: mysql_secure_installation.yml 
+
+- name: Allow mysql fro remote host
+  template: src=my.conf.j2 dest=/etc/mysql/my.cnf owner=root group=root mode=0644
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '14.04'
+  notify: mysql restart
+
+- name: Allow mysqld fro remote host
+  template: src=mysqld.cnf.j2 dest=/etc/mysql/mysql.conf.d/mysqld.cnf owner=root group=root mode=0644
+  notify: mysql restart
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
+  #when: ansible_distribution == "Ubuntu" and ansible_distribution_release == "xenial" 
